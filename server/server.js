@@ -4,6 +4,7 @@ import 'dotenv/config';
 import express from 'express';
 import connect from './db.js';
 import authRouter from './routes/auth.routes.js';
+import courseRouter from './routes/course.route.js';
 
 connect()
 const app = express();
@@ -17,6 +18,7 @@ app.get('/',(req, res)=>{
 });
 
 app.use('/api/auth', authRouter );
+app.use('/api/courses', courseRouter )
 
 app.listen(PORT, ()=>{
     console.log(`server running on ${PORT} `)

@@ -129,6 +129,37 @@ const profile = async(req, res) =>{
     }
 }
 
+const oauthLogin = async (req, res) => {
+  const { email, name, sub } = req.oidc.user;
 
-export { login, profile, signup };
+  // Check if user exists, otherwise create one
+  let user = await authModel.findOne({ email });
+
+  if (!user) {
+    user = await authModel.create({
+      name,
+      email,
+      password: '', // No local password
+      authType: 'google',
+      oauthId: sub
+    });
+  }
+
+  // Issue custom JWT
+  const token = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+  // Send token to frontend
+  res.status(200).json({
+    success: true,
+    message: 'OAuth login success',
+    token,
+    name: user.name
+  });
+};
+
+export { login, oauthLogin, profile, signup };
 
